@@ -1,6 +1,7 @@
 <template>
-  <table class="table">
-    <thead>
+  <div class="shadow p-3 mb-5 bg-body rounded">
+    <table class="table">
+      <thead>
       <tr>
         <th scope="col">#</th>
         <th scope="col">Name</th>
@@ -10,11 +11,13 @@
         <th scope="col"></th>
         <th scope="col"></th>
       </tr>
-    </thead>
-    <tbody>
+      </thead>
+      <tbody>
       <TableContent v-for="(student, index) in listStudent" :key="index" :student="student" :number="index" />
-    </tbody>
-  </table>
+      </tbody>
+    </table>
+  </div>
+
 </template>
 
 <script>
