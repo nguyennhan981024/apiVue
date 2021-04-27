@@ -1,6 +1,6 @@
 <template>
   <div class="shadow p-3 mb-5 bg-body rounded">
-    <button class="btn btn-primary" @click="hidden =!hidden">{{changeText()}}</button>
+    <button class="btn btn-primary" @click="hidden = !hidden">{{changeText()}}</button>
     <ValidationObserver ref="observer" v-slot="{ handleSubmit }" >
       <form @submit.prevent="handleSubmit(addNew)" v-if="!hidden">
         <div class="form-group mt-2">
@@ -9,7 +9,6 @@
             <input  type="text" class="form-control" v-model="newData.name" />
             <span :class="classes" class="styleSpan">{{ errors[0] }}</span>
           </ValidationProvider>
-
         </div>
         <ValidationProvider v-slot = "{errors,classes}" rules="required" name="birthday">
         <div class="form-group mt-2">
@@ -49,7 +48,7 @@ export default {
       text : '',
       hidden: true,
       newData: {
-        name: '',
+        name: '2323',
         address: '',
         birthday: '',
         telephone: ''
@@ -57,18 +56,28 @@ export default {
     };
   },
   computed: {
+    openForm(){
+      return this.$store.getters.openForm
+    },
     editStudent() {
       return this.$store.getters.editStudent;
     },
   },
+
   methods: {
     addNew() {
+
       if (!this.newData.id) {
         this.$store.dispatch('addStudent', { ...this.newData });
         this.clearForm();
+        this.$refs.observer.reset()
+
       } else {
-        this.$store.dispatch('editStudent', { ...this.newData });
-        this.clearForm();
+        if(confirm('Are you sure to edit ? ')){
+          this.$store.dispatch('editStudent', { ...this.newData });
+          this.clearForm();
+          this.$refs.observer.reset()
+        }
       }
     },
     clearForm() {
@@ -87,7 +96,13 @@ export default {
   },
   watch: {
     editStudent(newValue) {
-      this.newData = { ...newValue };
+      for(let key in this.newData){
+        this.newData[key] = newValue[key]
+      }
+      this.newData.id = newValue.id
+    },
+    openForm(newValue){
+      this.hidden = newValue
     }
 
   }

@@ -5,11 +5,13 @@ Vue.use(Vuex);
 const store = new Vuex.Store({
   state: {
     listStudent: [],
-    editStudent: null
+    editStudent: null,
+    openForm : true,
   },
   getters: {
     listStudent: state => state.listStudent,
-    editStudent: state => state.editStudent
+    editStudent: state => state.editStudent,
+    openForm : state => state.openForm,
   },
   actions: {
     async getStudents({ commit }) {
@@ -32,8 +34,12 @@ const store = new Vuex.Store({
       const result = await apis.editStudent(payload, payload.id);
       commit('editStudent', result.data);
     }
+
   },
   mutations: {
+    openForm(state,payload){
+      state.openForm = payload
+    },
     getStudents(state, payload) {
       state.listStudent = [...payload];
     },

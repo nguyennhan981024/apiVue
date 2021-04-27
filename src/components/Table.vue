@@ -3,7 +3,6 @@
     <table class="table">
       <thead>
       <tr>
-        <th scope="col">#</th>
         <th scope="col">Name</th>
         <th scope="col">Address</th>
         <th scope="col">Birthday</th>
@@ -13,9 +12,17 @@
       </tr>
       </thead>
       <tbody>
-      <TableContent v-for="(student, index) in listStudent" :key="index" :student="student" :number="index" />
+      <TableContent v-for="(student, index) in studentList" :key="index" :student="student" :number="index" />
       </tbody>
     </table>
+    <Pagination
+      :listStudent="studentList"
+      @handlePage="handlePage"
+      :totalPage="totalPage"
+      :currentPage="currentPage"
+      class="d-flex justify-content-center mt-5"
+    />
+
   </div>
 
 </template>
@@ -23,11 +30,48 @@
 <script>
 import { mapGetters } from 'vuex';
 import TableContent from '@/components/TableContent';
+import Pagination from "@/components/Pagination";
 export default {
+  data() {
+    return {
+      paginate: {
+        page: 1,
+        perPage: 3,
+        offset: 0,
+      },
+      studentList: [],
+      currentPage: 1,
+    };
+  },
+
   name: 'Table',
-  components: { TableContent },
+  components: {Pagination, TableContent },
   computed: {
-    ...mapGetters(['listStudent'])
+    ...mapGetters(['listStudent']),
+    totalPage() {
+      return Math.ceil(this.listStudent.length / 3);
+    },
+
+  },
+  methods : {
+    handlePage(obj) {
+      this.paginate = obj;
+      this.studentList = this.listStudent.slice(
+        this.paginate.offset,
+        this.paginate.offset + this.paginate.perPage
+      );
+      this.currentPage = this.paginate.page;
+    },
+
+  },
+  watch : {
+    listStudent(newValue) {
+      this.studentList = newValue.slice(
+        this.paginate.offset,
+        this.paginate.offset + this.paginate.perPage
+      );
+    },
+
   }
 };
 </script>

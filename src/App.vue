@@ -1,5 +1,5 @@
 <template>
-  <div class="container">
+  <div class="container" style="position: relative">
     <h1 class="text-center text-success">Student List</h1>
     <Form />
     <Table />

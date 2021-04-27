@@ -1,6 +1,5 @@
 <template>
   <tr>
-    <th scope="row">{{ number + 1 }}</th>
     <td>{{ student.name }}</td>
     <td>{{ student.address }}</td>
     <td>{{ formatDate }}</td>
@@ -20,10 +19,6 @@ export default {
         return null;
       }
     },
-    number: {
-      type: Number,
-      default: 0
-    }
   },
   computed: {
     formatDate() {
@@ -37,6 +32,7 @@ export default {
       }
     },
     editItem(id) {
+      this.$store.commit('openForm',false)
       this.$store.dispatch('getStudentById', id);
     }
   }

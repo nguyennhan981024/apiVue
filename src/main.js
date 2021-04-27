@@ -6,7 +6,6 @@ Vue.config.productionTip = false;
 
 import { ValidationProvider, ValidationObserver } from 'vee-validate';
 import rules from './validate'
-
 rules();
 
 Vue.component('ValidationProvider', ValidationProvider);
