@@ -1,25 +1,42 @@
 <template>
   <div class="shadow p-3 mb-5 bg-body rounded">
     <button class="btn btn-primary" @click="hidden =!hidden">{{changeText()}}</button>
-    <form @submit.prevent="addNew" v-show="hidden">
-      <div class="form-group">
-        <label>Name</label>
-        <input type="text" class="form-control" v-model="newData.name" />
-      </div>
-      <div class="form-group">
-        <label>Birthday</label>
-        <input type="date" class="form-control" v-model="newData.birthday" />
-      </div>
-      <div class="form-group">
-        <label>Address</label>
-        <input type="text" class="form-control" v-model="newData.address" />
-      </div>
-      <div class="form-group">
-        <label>Telephone</label>
-        <input type="text" class="form-control" v-model="newData.telephone" />
-      </div>
-      <button type="submit" class="btn btn-primary mt-3 mb-3">Add</button>
-    </form>
+    <ValidationObserver ref="observer" v-slot="{ handleSubmit }" >
+      <form @submit.prevent="handleSubmit(addNew)" v-if="!hidden">
+        <div class="form-group mt-2">
+          <label>Name</label>
+          <ValidationProvider v-slot = "{errors,classes}" rules="required|min:4" name="name">
+            <input  type="text" class="form-control" v-model="newData.name" />
+            <span :class="classes" class="styleSpan">{{ errors[0] }}</span>
+          </ValidationProvider>
+
+        </div>
+        <ValidationProvider v-slot = "{errors,classes}" rules="required" name="birthday">
+        <div class="form-group mt-2">
+          <label>Birthday</label>
+          <input type="date" class="form-control" v-model="newData.birthday" />
+          <span :class="classes" class="styleSpan">{{ errors[0] }}</span>
+        </div>
+        </ValidationProvider>
+        <ValidationProvider v-slot = "{errors,classes}" rules="required" name="address">
+        <div class="form-group mt-2">
+          <label>Address</label>
+          <input type="text" class="form-control" v-model="newData.address" />
+          <span :class="classes" class="styleSpan">{{ errors[0] }}</span>
+        </div>
+        </ValidationProvider>
+        <ValidationProvider v-slot = "{errors,classes}" rules="required|numeric" name="telephone">
+          <div class="form-group mt-2">
+            <label>Telephone</label>
+            <input type="text" class="form-control" v-model="newData.telephone" />
+            <span :class="classes" class="styleSpan">{{ errors[0] }}</span>
+          </div>
+        </ValidationProvider>
+
+        <button type="submit" class="btn btn-primary mt-3 mb-3">Add</button>
+      </form>
+    </ValidationObserver>
+
   </div>
 
 </template>
@@ -61,10 +78,10 @@ export default {
     },
     changeText() {
       if (this.hidden) {
-        return 'Close form'
+        return 'Open form'
       } else {
         this.clearForm()
-        return 'Open form'
+        return 'Close form'
       }
     }
   },
@@ -77,4 +94,11 @@ export default {
 };
 </script>
 
-<style scoped></style>
+<style scoped>
+.styleSpan{
+  color: red;
+  padding: 5px;
+  margin-top: 5px;
+  text-align: left;
+}
+</style>
