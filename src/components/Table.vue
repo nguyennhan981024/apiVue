@@ -34,11 +34,10 @@ import Pagination from "@/components/Pagination";
 export default {
   data() {
     return {
-      paginate: {
+
         page: 1,
         perPage: 3,
         offset: 0,
-      },
       studentList: [],
       currentPage: 1,
     };
@@ -49,26 +48,27 @@ export default {
   computed: {
     ...mapGetters(['listStudent']),
     totalPage() {
-      return Math.ceil(this.listStudent.length / this.paginate.perPage);
+      return Math.ceil(this.listStudent.length / this.perPage);
     },
 
   },
   methods : {
-    handlePage(obj) {
-      this.paginate = obj;
+    handlePage(index) {
+      this.page = index;
+      this.offset = (this.page - 1) * this.perPage;
       this.studentList = this.listStudent.slice(
-        this.paginate.offset,
-        this.paginate.offset + this.paginate.perPage
+        this.offset,
+        this.offset + this.perPage
       );
-      this.currentPage = this.paginate.page;
+      this.currentPage = this.page;
     },
 
   },
   watch : {
     listStudent(newValue) {
       this.studentList = newValue.slice(
-        this.paginate.offset,
-        this.paginate.offset + this.paginate.perPage
+        this.offset,
+        this.offset + this.perPage
       );
     },
 

@@ -37,23 +37,15 @@ export default {
   },
   computed: {
     prevEvent() {
-      return this.totalPage > 1 && this.currentPage === 1;
+      return  this.currentPage === 1;
     },
     nextEvent() {
-      return this.totalPage > 1 && this.currentPage === this.totalPage;
+      return this.currentPage === this.totalPage;
     },
   },
   methods:{
     handlePage(index){
-      let page = index || 1;
-      let perPage = 3;
-      let offset = (page - 1) * perPage;
-      let paginate = {
-        page : page,
-        perPage : perPage,
-        offset : offset
-      }
-      this.$emit('handlePage',paginate);
+      this.$emit('handlePage',index);
     }
   }
 };
