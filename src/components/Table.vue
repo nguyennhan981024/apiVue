@@ -1,6 +1,6 @@
 <template>
   <div class="shadow p-3 mb-5 bg-body rounded">
-    <table class="table">
+    <table class="table-responsive">
       <thead>
       <tr>
         <th scope="col">Name</th>
