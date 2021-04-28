@@ -1,6 +1,6 @@
 <template>
   <div class="shadow p-3 mb-5 bg-body rounded">
-    <table class="table-responsive">
+    <table class="table">
       <thead>
       <tr>
         <th scope="col">Name</th>
@@ -49,7 +49,7 @@ export default {
   computed: {
     ...mapGetters(['listStudent']),
     totalPage() {
-      return Math.ceil(this.listStudent.length / 3);
+      return Math.ceil(this.listStudent.length / this.paginate.perPage);
     },
 
   },
