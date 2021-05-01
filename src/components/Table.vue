@@ -1,6 +1,6 @@
 <template>
   <div class="shadow p-3 mb-5 bg-body rounded">
-    <table :class="[tableClass]" style="table-layout: fixed; width: 100%">
+    <table :class="[tableClass]" style="table-layout: fixed; width: 100%;">
       <thead>
         <tr>
           <th scope="col">Name</th>
@@ -25,6 +25,7 @@
       @handlePage="handlePage"
       :totalPage="totalPage"
       :currentPage="currentPage"
+      @changePerPage="changePerPage"
       class="d-flex justify-content-center mt-5"
     />
   </div>
@@ -37,12 +38,14 @@ import Pagination from "@/components/Pagination";
 export default {
   data() {
     return {
-      page: 1,
-      perPage: 3,
-      offset: 0,
+      paginate:{
+        page: 1,
+        perPage: 3,
+        offset: 0,
+      },
       studentList: [],
+      tableClass: "table",
       currentPage: 1,
-      tableClass: "table"
     };
   },
 
@@ -51,30 +54,34 @@ export default {
   computed: {
     ...mapGetters(["listStudent"]),
     totalPage() {
-      return Math.ceil(this.listStudent.length / this.perPage);
+      return Math.ceil(this.listStudent.length / this.paginate.perPage);
     }
   },
   methods: {
     handlePage(index) {
-      this.page = index;
-      this.offset = (this.page - 1) * this.perPage;
+      this.paginate.page = index;
+      this.paginate.offset = (this.paginate.page - 1) * this.paginate.perPage;
       this.studentList = this.listStudent.slice(
-        this.offset,
-        this.offset + this.perPage
+        this.paginate.offset,
+        this.paginate.offset + this.paginate.perPage
       );
-      this.currentPage = this.page;
+      this.currentPage = this.paginate.page;
     },
     handleResize() {
       this.tableClass = window.matchMedia("(max-width: 600px)").matches
         ? "table-responsive"
         : "table";
+    },
+    changePerPage(index) {
+      this.paginate.perPage = index;
+      this.handlePage(this.paginate.page);
     }
   },
   watch: {
     listStudent(newValue) {
       this.studentList = newValue.slice(
-        this.offset,
-        this.offset + this.perPage
+        this.paginate.offset,
+        this.paginate.offset + this.paginate.perPage
       );
     }
   },
