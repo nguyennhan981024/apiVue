@@ -1,43 +1,27 @@
 <template>
   <div class="shadow p-3 mb-5 bg-body rounded">
-    <button class="btn btn-primary" @click="hidden = !hidden">{{changeText()}}</button>
-    <ValidationObserver ref="observer" v-slot="{ handleSubmit }" >
-      <form @submit.prevent="handleSubmit(addNew)" v-if="!hidden">
-        <div class="form-group mt-2">
-          <label>Name</label>
-          <ValidationProvider v-slot = "{errors,classes}" rules="required|min:4" name="name">
-            <input  type="text" class="form-control" v-model="newData.name" />
-            <span :class="classes" class="styleSpan">{{ errors[0] }}</span>
-          </ValidationProvider>
-        </div>
-        <ValidationProvider v-slot = "{errors,classes}" rules="required" name="birthday">
-        <div class="form-group mt-2">
-          <label>Birthday</label>
-          <input type="date" class="form-control" v-model="newData.birthday" />
-          <span :class="classes" class="styleSpan">{{ errors[0] }}</span>
-        </div>
-        </ValidationProvider>
-        <ValidationProvider v-slot = "{errors,classes}" rules="required" name="address">
-        <div class="form-group mt-2">
-          <label>Address</label>
-          <input type="text" class="form-control" v-model="newData.address" />
-          <span :class="classes" class="styleSpan">{{ errors[0] }}</span>
-        </div>
-        </ValidationProvider>
-        <ValidationProvider v-slot = "{errors,classes}" rules="required|numeric" name="telephone">
+    <ValidationObserver ref="observer" v-slot="{ handleSubmit }">
+      <form @submit.prevent="handleSubmit(addNew)">
+        <ValidationProvider
+          v-slot="{ errors, classes }"
+          v-for="(data, index) in formData"
+          :key="index"
+          :rules="data.rule"
+          :name="data.name"
+        >
           <div class="form-group mt-2">
-            <label>Telephone</label>
-            <input type="text" class="form-control" v-model="newData.telephone" />
+            <label>{{ data.name }}</label>
+            <input :type="data.type" class="form-control" v-model="data.model" />
             <span :class="classes" class="styleSpan">{{ errors[0] }}</span>
           </div>
         </ValidationProvider>
-
-        <button type="submit" class="btn btn-primary mt-3 mb-3">Add</button>
+        <div class="d-flex justify-content-between">
+          <button type="submit" class="btn btn-primary mt-3 mb-3">Add</button>
+          <router-link class="btn btn-secondary mb-3 mt-3" to="/">back</router-link>
+        </div>
       </form>
     </ValidationObserver>
-
   </div>
-
 </template>
 
 <script>
@@ -45,72 +29,99 @@ export default {
   name: 'Form',
   data() {
     return {
-      text : '',
+      text: '',
       hidden: true,
       newData: {
-        name: '2323',
-        address: '',
+        name: '',
         birthday: '',
+        address: '',
         telephone: ''
-      }
+      },
+      formData: [
+        {
+          model: '',
+          name: 'name',
+          type: 'text',
+          rule: 'required|min:4'
+        },
+        {
+          model: '',
+          name: 'birthday',
+          type: 'date',
+          rule: 'required'
+        },
+        {
+          model: '',
+          name: 'address',
+          type: 'text',
+          rule: 'required'
+        },
+        {
+          model: '',
+          name: 'telephone',
+          type: 'text',
+          rule: 'required|numeric'
+        }
+      ]
     };
   },
   computed: {
-    openForm(){
-      return this.$store.getters.openForm
+    openForm() {
+      return this.$store.getters.openForm;
     },
     editStudent() {
       return this.$store.getters.editStudent;
-    },
+    }
   },
 
   methods: {
+    transferObject() {
+      const newObject = this.formData.reduce((obj, item) => {
+        obj[item.name] = item.model;
+        return obj;
+      }, {});
+      Object.keys(newObject).forEach(key => {
+        return (this.newData[key] = newObject[key]);
+      });
+    },
     addNew() {
-
+      this.transferObject();
       if (!this.newData.id) {
-        this.$store.dispatch('addStudent', { ...this.newData });
+        this.$store.dispatch('ADD_STUDENT', { ...this.newData });
         this.clearForm();
-        this.$refs.observer.reset()
-
+        this.$refs.observer.reset();
+        this.$router.push('/');
       } else {
-        if(confirm('Are you sure to edit ? ')){
-          this.$store.dispatch('editStudent', { ...this.newData });
+        if (confirm('Are you sure to edit ? ')) {
+          this.$store.dispatch('EDIT_STUDENT', { ...this.newData });
           this.clearForm();
-          this.$refs.observer.reset()
+          this.$router.push('/');
+          this.$refs.observer.reset();
         }
       }
     },
     clearForm() {
-      for (let key in this.newData) {
-        this.newData[key] = '';
-      }
-    },
-    changeText() {
-      if (this.hidden) {
-        return 'Open form'
-      } else {
-        this.clearForm()
-        return 'Close form'
-      }
+      this.formData.forEach(item => {
+        item.model = '';
+      });
     }
   },
   watch: {
     editStudent(newValue) {
-      for(let key in this.newData){
-        this.newData[key] = newValue[key]
-      }
-      this.newData.id = newValue.id
+      this.formData.forEach(item => {
+        item.model = newValue[item.name];
+      });
+      this.newData.id = newValue.id;
     },
-    openForm(newValue){
-      this.hidden = newValue
+    openForm(newValue) {
+      this.hidden = newValue;
     }
-
   }
 };
 </script>
 
 <style scoped>
-.styleSpan{
+.styleSpan {
   color: red;
   padding: 5px;
   margin-top: 5px;

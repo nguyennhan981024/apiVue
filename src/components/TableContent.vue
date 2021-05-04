@@ -18,7 +18,7 @@
 </template>
 <script>
 export default {
-  name: "TableContent",
+  name: 'TableContent',
   props: {
     student: {
       type: Object,
@@ -34,13 +34,13 @@ export default {
   },
   methods: {
     deleteItem(id) {
-      if (confirm("Are you sure to delete ?")) {
-        this.$store.dispatch("deleteStudent", id);
+      if (confirm('Are you sure to delete ?')) {
+        this.$store.dispatch('DELETE_STUDENT', id);
       }
     },
     editItem(id) {
-      this.$store.commit("openForm", false);
-      this.$store.dispatch("getStudentById", id);
+      this.$store.dispatch('GET_STUDENT_BY_ID', id);
+      this.$router.push('/form');
     }
   }
 };
