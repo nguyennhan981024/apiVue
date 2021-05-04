@@ -7,19 +7,24 @@ const store = new Vuex.Store({
     listStudent: [],
     editStudent: null,
     openForm: true,
-    keyWord: ''
+    keyWord: '',
+    loadMore: true,
+    selectedItem: []
   },
   getters: {
     listStudent: state => state.listStudent,
     editStudent: state => state.editStudent,
     openForm: state => state.openForm,
     formData: state => state.formData,
-    keyWord: state => state.keyWord
+    keyWord: state => state.keyWord,
+    loadMore: state => state.loadMore,
+    selectedItem: state => state.selectedItem
   },
   actions: {
     async GET_STUDENTS({ commit }) {
       const result = await apis.getStudents();
       commit('SET_STUDENTS', result.data);
+      this.state.loadMore = false;
     },
     async ADD_STUDENT({ commit }, payload) {
       const result = await apis.addStudent(payload);
@@ -30,8 +35,8 @@ const store = new Vuex.Store({
       commit('DELETE_STUDENT', result.data);
     },
     async GET_STUDENT_BY_ID({ commit }, payload) {
-      const resutl = await apis.getStudentById(payload);
-      commit('GET_STUDENT_BY_ID', resutl.data);
+      const result = await apis.getStudentById(payload);
+      commit('GET_STUDENT_BY_ID', result.data);
     },
     async EDIT_STUDENT({ commit }, payload) {
       const result = await apis.editStudent(payload, payload.id);
@@ -39,6 +44,16 @@ const store = new Vuex.Store({
     },
     SEARCH_STUDENT({ commit }, payload) {
       commit('SEARCH_STUDENT', payload);
+    },
+    GET_SELECTED_STUDENT({ commit }, payload) {
+      console.log(payload);
+      commit('GET_SELECTED_STUDENTS', payload);
+    },
+    async DELETE_MULTI_STUDENTS({ commit }, payload) {
+      for (let id in payload) {
+        const result = await apis.deleteStudent(id);
+        commit('DELETE_MULTI_STUDENTS', result.data);
+      }
     }
   },
   mutations: {
@@ -67,6 +82,17 @@ const store = new Vuex.Store({
     },
     SEARCH_STUDENT(state, payload) {
       state.keyWord = payload;
+    },
+    GET_SELECTED_STUDENTS(state, payload) {
+      state.selectedItem = [...payload];
+    },
+    DELETE_MULTI_STUDENTS(state, payload) {
+      [...payload].forEach(item => {
+        state.listStudent.splice(
+          state.listStudent.findIndex(i => i.id === item),
+          1
+        );
+      });
     }
   }
 });

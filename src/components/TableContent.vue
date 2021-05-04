@@ -1,9 +1,7 @@
 <template>
   <tr>
-    <td style="word-wrap: break-word">{{ student.name }}</td>
-    <td style="word-wrap: break-word;">{{ student.address }}</td>
-    <td>{{ formatDate }}</td>
-    <td>{{ student.telephone }}</td>
+    <td><input class="form-check-input" type="checkbox" :value="student.id" v-model="selectedItem" /></td>
+    <td style="word-wrap: break-word" v-for="title in titles" :key="title.id">{{ student[title.value] }}</td>
     <td>
       <button class="btn btn-warning" @click="editItem(student.id)">
         Edit
@@ -19,17 +17,36 @@
 <script>
 export default {
   name: 'TableContent',
+  data() {
+    return {
+      content: {}
+    };
+  },
   props: {
     student: {
       type: Object,
       default: () => {
         return null;
       }
+    },
+    titles: {
+      type: Array,
+      default: () => {
+        return [];
+      }
     }
   },
   computed: {
     formatDate() {
       return new Date(this.student.birthday).toDateString();
+    },
+    selectedItem: {
+      get: function() {
+        return this.$store.state.selectedItem;
+      },
+      set: function(newValue) {
+        return this.$store.dispatch('GET_SELECTED_STUDENT', newValue);
+      }
     }
   },
   methods: {
