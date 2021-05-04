@@ -1,5 +1,8 @@
 <template>
   <div class="shadow p-3 mb-5 bg-body rounded">
+    <router-link class="btn btn-success" to="/form"> form </router-link>
+
+    <Search />
     <table :class="[tableClass]" style="table-layout: fixed; width: 100%;">
       <thead>
         <tr>
@@ -12,12 +15,7 @@
         </tr>
       </thead>
       <tbody>
-        <TableContent
-          v-for="(student, index) in studentList"
-          :key="index"
-          :student="student"
-          :number="index"
-        />
+        <TableContent v-for="(student, index) in studentList" :key="index" :student="student" :number="index" />
       </tbody>
     </table>
     <Pagination
@@ -32,27 +30,29 @@
 </template>
 
 <script>
-import { mapGetters } from "vuex";
-import TableContent from "@/components/TableContent";
-import Pagination from "@/components/Pagination";
+import { mapGetters } from 'vuex';
+import TableContent from '@/components/TableContent';
+import Pagination from '@/components/Pagination';
+import Search from '@/components/Search';
 export default {
+  name: 'Table',
+  components: { Search, Pagination, TableContent },
   data() {
     return {
-      paginate:{
+      paginate: {
         page: 1,
-        perPage: 3,
-        offset: 0,
+        perPage: 4,
+        offset: 0
       },
       studentList: [],
-      tableClass: "table",
+      tableClass: 'table',
       currentPage: 1,
+      searchValue: []
     };
   },
-
-  name: "Table",
-  components: { Pagination, TableContent },
   computed: {
-    ...mapGetters(["listStudent"]),
+    ...mapGetters(['listStudent', 'keyWord']),
+
     totalPage() {
       return Math.ceil(this.listStudent.length / this.paginate.perPage);
     }
@@ -61,16 +61,11 @@ export default {
     handlePage(index) {
       this.paginate.page = index;
       this.paginate.offset = (this.paginate.page - 1) * this.paginate.perPage;
-      this.studentList = this.listStudent.slice(
-        this.paginate.offset,
-        this.paginate.offset + this.paginate.perPage
-      );
+      this.studentList = this.listStudent.slice(this.paginate.offset, this.paginate.offset + this.paginate.perPage);
       this.currentPage = this.paginate.page;
     },
     handleResize() {
-      this.tableClass = window.matchMedia("(max-width: 600px)").matches
-        ? "table-responsive"
-        : "table";
+      this.tableClass = window.matchMedia('(max-width: 600px)').matches ? 'table-responsive' : 'table';
     },
     changePerPage(index) {
       this.paginate.perPage = index;
@@ -79,19 +74,35 @@ export default {
   },
   watch: {
     listStudent(newValue) {
-      this.studentList = newValue.slice(
-        this.paginate.offset,
-        this.paginate.offset + this.paginate.perPage
-      );
+      this.studentList = newValue.slice(this.paginate.offset, this.paginate.offset + this.paginate.perPage);
+    },
+    searchValue(newValue) {
+      this.studentList = [...newValue];
+    },
+    keyWord(newValue) {
+      this.searchValue = [...this.listStudent].filter(item => {
+        for (let key in item) {
+          if (
+            item[key]
+              .toString()
+              .toLowerCase()
+              .includes(newValue.toLowerCase())
+          ) {
+            return item;
+          }
+        }
+      });
     }
   },
-
-  mounted() {
+  created() {
+    window.addEventListener('resize', this.handleResize);
     this.handleResize();
-    window.addEventListener("resize", this.handleResize);
   },
   destroyed() {
-    window.removeEventListener("resize", this.handleResize);
+    window.removeEventListener('resize', this.handleResize);
+  },
+  mounted() {
+    this.$store.dispatch('GET_STUDENTS');
   }
 };
 </script>
